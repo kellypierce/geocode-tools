@@ -12,6 +12,23 @@ geocode_handler <- function(data_chunk){
   return(result)
 }
 
+bind_rows_handler <- function(original, addition){
+  result <- {tryCatch(
+    bind_rows(original, addition),
+    error=function(c) c$message,
+    warning=function(c) c$message,
+    message=function(c) c$message
+  )}
+  if(typeof(result)=='list'){
+    # if no error, return the combined data structure
+    return(result)
+  }else{
+    # else return the original chunk and print the error/warning/message
+    message(result)
+    return(original)
+  }
+}
+
 geocode_chunker <- function(data, chunk_size){
   increments <- seq(1, length(data[,1]), chunk_size)
   chunk_list = list()
@@ -29,10 +46,12 @@ geocode_launcher <- function(chunks){
   for(i in 1:length(chunks)){
     geocode_result <- geocode_handler(chunks[[i]])
     if(typeof(geocode_result)=="list"){
-      geocoded <- bind_rows(geocoded, geocode_result)
+      geocoded <- bind_rows_handler(geocoded, geocode_result)
     }else{ #todo: retry these chunks instead of skipping
-      my_alert <- paste('Warning encountered while processing chunk ', start, '-', stop, ':', geocode_result, sep='')
+      start <- i * dim(chunks[[i]])[1]
+      my_alert <- paste('Warning encountered while processing chunk starting at row', as.character(start), sep=' ')
       message(my_alert)
+      message(geocode_result)
     }
     Sys.sleep(3)
   }
@@ -55,12 +74,13 @@ if(!interactive()){
   opt = parse_args(opt_parser)
   addr <- read.csv(opt$file)
   outf <- opt$output
+  cs <- as.numeric(as.character(opt$chunksize))
   # override user specified chunk size if it's greater than the max allowed by the us census bureau api
-  if (opt$chunksize > 10000) {cs <- 10000}
-  else {cs <- opt$chunksize}
+  if (cs > 10000) {cs <- 10000}
   
   # load in the file and geocode in chunks of no more than 10,000
   chunksize <- min(cs, dim(addr)[1])
+  message(paste('Processing data in batches of', chunksize, sep=' '))
   fchunk <- geocode_chunker(addr, chunk_size=chunksize)
   geocodes <- geocode_launcher(fchunk)
   original <- basename(opt$file)
