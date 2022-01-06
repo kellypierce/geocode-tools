@@ -1,0 +1,5 @@
+logfiles/
+logfiles/*
+.DS_Store
+.idea/
+.ipynb_checkpoints/
