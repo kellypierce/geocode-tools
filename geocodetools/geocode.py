@@ -61,6 +61,7 @@ def main():
 
     rdf = pandas2ri.py2rpy(df)
     rtib = r_as_tibble(rdf)
+
     gc = r_geocode(
         rtib,
         address='full_address',
@@ -76,5 +77,19 @@ if __name__ == '__main__':
     # load USPS API credentials
     with open('/Users/kpierce/CooksProTX/usps_api_credentials.json', 'r') as f:
         credentials = json.load(f)
+
+    """
+    Workflow
+    1. Batch geocode with tidygeocoder
+        - free
+        - limited to 10k addresses at a time
+    2. Validate addresses that don't match
+        - free
+        - limited to 500 addresses at a time (hence not starting with validation
+    3. Re-attempt geocoding with tidygeocoder
+    4. Final attempt with ESRI geocoder
+        - not free
+    Report match rate at each step (output to logfile? text based report?)
+    """
 
     result = main()
