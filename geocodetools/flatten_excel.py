@@ -37,16 +37,15 @@ def clean_sheets(sheet_name, sheet, metadata):
         Steps:
             1. drop all rows and columns that are completely NA
             2. drop rows where only the first column has data (this indicates notes above the actual data)
-            3. if the first row after filters 1 and 2 is fully populated with strings, make that row the header
-            4. if rule 3 can't be met, return an error
-            5. fix column types -- reading in w/no header will make numeric columns object type
+            3. find the row that contains the column names in the metadata
+            4. fix column types -- reading in w/no header will make numeric columns object type
     """
 
     # drop all columns that are completely null, and all rows that have one or fewer entries
     column_clean = sheet.dropna(axis=1, how='all')
     row_column_clean = column_clean.dropna(axis=0, how='all', thresh=2)
 
-    # start discarding rows until one that is full is encountered
+    # start discarding rows until one contains expected column names is found
     header_found = False
     header_index = None
     valid_idx = [i for i in row_column_clean.index]

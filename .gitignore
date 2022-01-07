@@ -3,3 +3,6 @@ logfiles/*
 .DS_Store
 .idea/
 .ipynb_checkpoints/
+local_geocodes/
+local_geocodes/*
+geocodetools/notebooks/local_geocode_reference.ipynb
