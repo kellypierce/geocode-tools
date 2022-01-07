@@ -1,0 +1,5 @@
+{
+	"day": "str",
+	"is_weekend": "str",
+	"sheet_name": "str"
+}

@@ -1,0 +1,4 @@
+{
+	"day": "str",
+	"is_weekend": "str"
+}
