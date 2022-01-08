@@ -1,3 +1,4 @@
+.env
 logfiles/
 logfiles/*
 .DS_Store
