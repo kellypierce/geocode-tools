@@ -4,7 +4,6 @@ import json
 import datetime
 import pdb
 from .utils import type_sanitizer
-logging.basicConfig(filename='../logfiles/geocode.log')
 
 
 def collect_sheets(sheet_path, metadata_path):

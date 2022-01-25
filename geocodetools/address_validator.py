@@ -4,7 +4,6 @@ import pdb
 from dotenv import load_dotenv
 load_dotenv()
 import logging
-logging.basicConfig(filename='../logfiles/geocode.log')
 
 def load_credentials():
 
