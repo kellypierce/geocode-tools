@@ -1,5 +1,5 @@
-from arcgis.gis import GIS
-from arcgis.geocoding import Geocoder, get_geocoders, geocode, batch_geocode
+#from arcgis.gis import GIS
+#from arcgis.geocoding import Geocoder, get_geocoders, geocode, batch_geocode
 from usps import USPSApi, Address
 import pandas as pd
 import json

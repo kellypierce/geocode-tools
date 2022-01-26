@@ -2,7 +2,6 @@ import datetime
 import logging
 import pandas as pd
 import pdb
-logging.basicConfig(filename='../logfiles/geocode.log')
 
 
 def type_sanitizer(series, target_type):
@@ -20,3 +19,17 @@ def type_sanitizer(series, target_type):
             logging.info('Unable to convert pd.Series to type {}'.format(target_type))
 
     return series
+
+
+def deduplicate_colnames(df):
+    '''https://stackoverflow.com/questions/24685012/pandas-dataframe-renaming-multiple-identically-named-columns'''
+
+    cols = pd.Series(df.columns)
+    for dup in df.columns[df.columns.duplicated(keep=False)]:
+        cols[df.columns.get_loc(dup)] = ([dup + '_' + str(d_idx)
+                                          if d_idx != 0
+                                          else dup
+                                          for d_idx in range(df.columns.get_loc(dup).sum())]
+        )
+    df.columns = cols
+    return df

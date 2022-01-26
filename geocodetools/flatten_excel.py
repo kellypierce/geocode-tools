@@ -1,9 +1,15 @@
 import pandas as pd
-import logging
 import json
 import datetime
 import pdb
-from .utils import type_sanitizer
+import logging
+import sys
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+consoleHandler = logging.StreamHandler(sys.stdout)
+consoleHandler.setLevel(logging.DEBUG)
+logger.addHandler(consoleHandler)
+from .utils import type_sanitizer, deduplicate_colnames
 
 
 def collect_sheets(sheet_path, metadata_path):
@@ -63,9 +69,13 @@ def clean_sheets(sheet_name, sheet, metadata):
         logging.error('Unable to find expected header row in {}'.format(sheet_name))
         raise AssertionError
 
-    row_column_clean.columns = row_column_clean.loc[header_index]
+    row_column_clean.columns = [str(i).strip() for i in row_column_clean.loc[header_index]]
     row_column_clean.columns.name = None
     row_column_clean = row_column_clean.drop(labels=header_index)
+    row_column_clean = row_column_clean.dropna(how='all', axis=1)
+    row_column_clean = deduplicate_colnames(row_column_clean)
+
+    logging.info(f'Identified header names {row_column_clean.columns} in sheet {sheet_name}.')
 
     # sanitize the column types. if type not specified, treat as a string
     for col in row_column_clean:
@@ -74,6 +84,10 @@ def clean_sheets(sheet_name, sheet, metadata):
         except KeyError:
             target_type = 'str'
 
-        row_column_clean[col] = type_sanitizer(row_column_clean[col], target_type=target_type)
+        try:
+            row_column_clean[col] = type_sanitizer(row_column_clean[col], target_type=target_type)
+        except KeyError:
+            logging.info(f'Unable to slice column {col} from data frame.')
+            raise Exception
 
     return row_column_clean
