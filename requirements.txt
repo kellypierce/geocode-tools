@@ -12,6 +12,8 @@ entrypoints==0.3
 et-xmlfile==1.1.0
 fastparquet==0.7.2
 fsspec==2021.11.1
+geocode-tools==0.1.1
+geocodetools==0.1.1
 idna==3.3
 iniconfig==1.1.1
 ipykernel==6.6.1
